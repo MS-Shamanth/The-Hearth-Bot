@@ -388,9 +388,19 @@ class Companion:
             if out:
                 reply = str(out.get("reply") or "").strip() or None
                 model_severity = Severity.parse(out.get("severity"))
+                # The model sees the chat history, so it can confuse an old scam with today's
+                # message. From text it may raise severity to MEDIUM at most; HIGH and RED come
+                # from the rules. Photos (scam screenshots) are the exception.
+                if not images:
+                    model_severity = min(model_severity, max(severity, Severity.LOW))
                 if model_severity > severity:  # the one-way ratchet: the model can only raise it
                     severity = model_severity
-                    kind = str(out.get("kind") or kind)
+                    model_kind = str(out.get("kind") or kind)
+                    # A capped text message can't become a scam or emergency alert.
+                    if images or model_kind not in {"scam", "relative-in-trouble", "fall", "medical-emergency"}:
+                        kind = model_kind
+                    elif kind == "update":
+                        kind = "unwell"
                     why = "; ".join(filter(None, [why, f"the model rated it {model_severity.label}"]))
                 summary = str(out.get("family_summary") or "")
                 care = out.get("care_update") if isinstance(out.get("care_update"), dict) else None
