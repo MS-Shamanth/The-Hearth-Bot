@@ -81,7 +81,7 @@ class Pulse:
     def _load_state(self) -> dict[str, Any]:
         if self.state_path.exists():
             try:
-                return json.loads(self.state_path.read_text(encoding="utf-8"))
+                return json.loads(self.state_path.read_text(encoding="utf-8-sig"))
             except (ValueError, OSError):
                 pass
         return {}

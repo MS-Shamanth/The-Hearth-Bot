@@ -72,7 +72,7 @@ class AgentCredentials:
             raise FileNotFoundError(
                 f"No credentials for agent {name!r} at {path}. Run: hearth-register {name}"
             )
-        data = json.loads(path.read_text(encoding="utf-8"))
+        data = json.loads(path.read_text(encoding="utf-8-sig"))
         return cls(**data)
 
     def save(self) -> Path:

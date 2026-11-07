@@ -31,7 +31,7 @@ def load(path: Path) -> list[LearnedScam]:
     if not path.exists():
         return []
     try:
-        return [LearnedScam(**item) for item in json.loads(path.read_text(encoding="utf-8"))]
+        return [LearnedScam(**item) for item in json.loads(path.read_text(encoding="utf-8-sig"))]
     except (ValueError, TypeError):
         return []
 

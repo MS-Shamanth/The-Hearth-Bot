@@ -114,7 +114,7 @@ class IncidentBook:
     def load(self) -> None:
         if not self.path or not self.path.exists():
             return
-        data = json.loads(self.path.read_text(encoding="utf-8"))
+        data = json.loads(self.path.read_text(encoding="utf-8-sig"))
         self._next_id = int(data.get("next_id", 1))
         self.incidents = []
         for raw in data.get("incidents", []):

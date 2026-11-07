@@ -111,7 +111,7 @@ class Companion:
     def _load_done(self) -> set[str]:
         if self.state_path.exists():
             try:
-                return set(json.loads(self.state_path.read_text(encoding="utf-8")).get("done", []))
+                return set(json.loads(self.state_path.read_text(encoding="utf-8-sig")).get("done", []))
             except (ValueError, OSError):
                 return set()
         return set()
