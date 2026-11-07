@@ -52,6 +52,11 @@ _HISTORY_TURNS = 16
 _SCAM_KINDS = {"scam", "relative-in-trouble", "money-request"}
 
 
+def _squash(name: str) -> str:
+    """"Shreya BJ", "@ShreyaBJ" and "shreyabj" are the same person."""
+    return "".join(ch for ch in name.lower() if ch.isalnum())
+
+
 def _safety_reply(style: str, severity: Severity, kind: str, values: dict[str, str]) -> str | None:
     """The fixed reply for the cases where speed and exact wording matter most."""
     if severity >= Severity.RED:
@@ -318,8 +323,8 @@ class Companion:
             if event.body and not any(t.text == event.body for t in self.history[-3:]):
                 self.history.append(Turn("hearth", event.body, now))
             return
-        handle = self.cfg.parent.handle.lower()
-        if handle and event.sender_name.lower().lstrip("@") != handle:
+        handle = _squash(self.cfg.parent.handle)
+        if handle and _squash(event.sender_name) != handle:
             return  # a sibling or someone else in the group, not the parent
         if event.body.startswith(("!", "/")):
             return  # a Switch command, handled by Switch
