@@ -1,0 +1,84 @@
+# Hearth family config. Copy to config/hearth.yaml and edit.
+# Everything here is fictional demo data. Real use needs the parent's consent.
+
+parent:
+  name: Amma                  # how the family refers to her
+  call_name: Amma             # how Hearth greets her
+  language: >-
+    Kannada and English mixed, the way she texts (Kanglish). Reply in the same
+    mix she uses. Short sentences. Kannada script only if she writes in it.
+  timezone: Asia/Kolkata
+  city: Mysuru
+  emergency_number: "112"     # India: 112 for any emergency
+  ambulance_number: "108"     # India: 108 for an ambulance
+  template_style: kanglish    # fixed safety messages: kanglish or english
+  # Her name as Switch reports the sender in the Telegram group. Leave empty to
+  # treat every person in that group as the parent (fine when it's just her).
+  handle: ""
+
+# The people on the rota. `handle` must be the name Switch knows them by in the
+# family room (run `hearth-setup --participants` to list them).
+# `on_duty` is local time, HH:MM-HH:MM; it can wrap past midnight.
+siblings:
+  - name: Shamanth
+    handle: ms_shamanth
+    timezone: Asia/Kolkata
+    on_duty: "07:00-23:00"
+  - name: Shreya
+    handle: shreyabj
+    timezone: Europe/Berlin
+    on_duty: "17:00-09:00"
+
+rooms:
+  # The Telegram group with the parent and the Switch bot. Switch names the room
+  # after the chat title.
+  parent_room: "Amma Hearth"
+  # The Discord channel where the siblings work.
+  family_room: "hearth-family-desk"
+
+agents:
+  pulse: hearth-pulse
+  companions:                 # one per laptop; whichever starts first answers
+    - hearth-companion-a
+    - hearth-companion-b
+  scribe: hearth-scribe       # a Codex or Claude Code agent made in Switch Console
+  companion_role: companion
+
+checkins:
+  times: ["20:00"]            # always-sent check-ins, parent's local time
+  no_reply_minutes: 120       # no answer to a check-in this long raises a MEDIUM alert
+  daily_summary_time: "21:30" # the companion posts "Today with Amma" for the scribe
+  # The dead man's switch. Amma usually writes first thing in the morning. If she
+  # hasn't written since `since` by `expect_by`, Hearth checks in gently
+  # ("Amma, kaafi aaytha?"). No answer within `reply_within_minutes` pages the
+  # person on duty (MEDIUM: someone should call today, not an emergency).
+  quiet_check:
+    expect_by: "10:30"
+    since: "05:00"
+    reply_within_minutes: 45
+
+# Shift handoff: when the first person on the rota changes, pulse posts what
+# happened with Amma over the last few hours, tagging the incoming sibling.
+handoff:
+  lookback_hours: 8
+
+# "We have detained your son": when a caller claims one of the children is in
+# trouble, pulse asks that child to reply `safe` and tells Amma. A child active
+# in the family room this recently is reported to Amma as just seen.
+shield:
+  recent_minutes: 15
+
+escalation:
+  # Seconds to wait for an "ack" before paging the next person.
+  ack_timeout_seconds:
+    red: 120
+    high: 300
+    medium: 900
+  # Used instead when HEARTH_DEMO=1.
+  demo_ack_timeout_seconds: 45
+  companion_offline_seconds: 30
+
+digest:
+  weekday: sunday
+  time: "19:00"
+  timezone: Asia/Kolkata

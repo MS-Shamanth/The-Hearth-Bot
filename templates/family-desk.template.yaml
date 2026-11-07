@@ -1,0 +1,44 @@
+# Hearth family desk: the room where siblings coordinate a parent's care.
+#
+# Use it from Switch Console (Templates > Import template) or let
+# `hearth-setup --bridge <Discord connection name>` run it for you.
+# The parent's own room is a Telegram group, which a template can't create
+# (Telegram bots can't make groups), so hearth-setup adopts that one and links
+# the two rooms. hearth-setup also writes the full instructions and shared
+# documents from room/*.md, so this file only needs the skeleton.
+version: 1
+params:
+  room_name:
+    type: string
+    label: Room name
+    default: hearth-family-desk
+    pattern: "^[a-z0-9][a-z0-9-]*$"
+  parent:
+    type: string
+    label: Parent's name, as the family says it
+    default: Amma
+  bridge:
+    type: bridge
+    label: Messaging app for the siblings
+    default: [Discord, $first]
+  pulse:
+    type: agent
+    label: The pager agent (hearth-pulse)
+    default: [hearth-pulse]
+  scribe:
+    type: agent
+    label: The scribe (a Codex or Claude Code agent)
+    default: [hearth-scribe]
+room:
+  name: "{room_name}"
+  description: "Where {parent}'s children coordinate her care with Hearth"
+  bridge: "{bridge}"
+  channel_type: channel_private
+  agents: ["{pulse}", "{scribe}"]
+  users: ["{$creator}"]
+  instructions: |
+    This is the family desk for {parent}'s care. {parent} talks to Hearth in her
+    own Telegram room. Alerts from her companion land here; {pulse} pages the
+    sibling on duty and re-pages until someone replies `ack`. {scribe} keeps the
+    care book and changes it only after a sibling confirms. Agents never give
+    medical advice, never move money, and never decide for the family.
